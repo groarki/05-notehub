@@ -9,6 +9,7 @@ import Pagination from "../Pagination/Pagination"
 import NoteModal from "../NoteModal/NoteModal"
 import SearchBox from "../SearchBox/SearchBox"
 import { useDebounce } from "use-debounce"
+import Loader from "../Loader/Loader"
 
 
 function App() {
@@ -20,7 +21,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState("")
   const [debouncedQuery] = useDebounce(searchQuery, 300)
   
-  const { data, isSuccess } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["todos", currentPage, debouncedQuery],
     queryFn: () => fetchNotes(currentPage, 10, debouncedQuery),
     placeholderData: keepPreviousData,
@@ -55,18 +56,19 @@ function App() {
     <div className={css.app}>
       <header className={css.toolbar}>
         <SearchBox value={searchQuery} onSearch={setSearchQuery} />
-        {isSuccess && totalPages > 1 && (
+        {data && totalPages > 1 && (
           <Pagination totalPages={totalPages} currentPage={currentPage} onPageChange={setCurrentPage} />)}
         {<button className={css.button} onClick={() => setIsModalOpen(true)}>Create note +</button>
         }
       </header>
+      {isLoading && <Loader/>}
       {data && <NoteList notes={data.notes} onDelete={handleDeleteNote}/>}
       {isModalOpen && (
         <NoteModal
           onClose={() => setIsModalOpen(false)}
           onSubmitNote={handleCreateNote}
         />
-      )};
+      )}
     </div>
   );
 };
