@@ -4,7 +4,7 @@ import NoteList from "../NoteList/NoteList"
 import type { createNoteValues } from "../../types/note"
 
 import css from "./App.module.css"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Pagination from "../Pagination/Pagination"
 import NoteModal from "../NoteModal/NoteModal"
 import SearchBox from "../SearchBox/SearchBox"
@@ -22,13 +22,17 @@ function App() {
   const [debouncedQuery] = useDebounce(searchQuery, 300)
   
   const { data, isLoading } = useQuery({
-    queryKey: ["todos", currentPage, debouncedQuery],
-    queryFn: () => fetchNotes(currentPage, 10, debouncedQuery),
+    queryKey: ["notes", debouncedQuery, currentPage],
+    queryFn: () => fetchNotes(debouncedQuery, currentPage),
     placeholderData: keepPreviousData,
   });
   
   const totalPages = data?.totalPages ?? 0;
   
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedQuery]);
+
   const createMutation = useMutation({
     mutationFn: createNote,
     onSuccess: () => {

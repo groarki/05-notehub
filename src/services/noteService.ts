@@ -9,15 +9,15 @@ interface fetchNotes {
 axios.defaults.baseURL = "https://notehub-public.goit.study/api"
 const token = import.meta.env.VITE_TOKEN
 
-export async function fetchNotes(page: number, perPage: number, searchQuery: string) {
+export async function fetchNotes(searchText: string, page: number) {
     const res = await axios.get<fetchNotes>("/notes", {
         headers: {
             Authorization: `Bearer ${token}`,
         },
         params: {
             page,
-            perPage,
-            ...(searchQuery && { search: searchQuery }),
+            perPage: 10,
+            ...(searchText && { search: searchText }),
         }
     }) 
     return res.data
