@@ -3,6 +3,8 @@ import { Formik, Form, Field, type FormikHelpers, ErrorMessage } from "formik"
 import { useId } from "react"
 import * as Yup from "yup";
 import type { createNoteValues } from "../../types/note";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createNote } from "../../services/noteService";
 
 const initialValues: createNoteValues = {
     title: "",
@@ -23,20 +25,26 @@ const noteModalSchema = Yup.object().shape({
 
 interface NoteFormProps {
     onClose: () => void,
-    onSubmit: (values: createNoteValues) => void
 }
   
-export default function NoteForm({ onClose, onSubmit }: NoteFormProps) {
+export default function NoteForm({ onClose }: NoteFormProps) {
 const fieldId = useId()
+  const queryClient = useQueryClient()
+  
+  const createMutation = useMutation({
+    mutationFn: createNote,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] })
+      onClose()
+    }
+  });
 
     const handleCreateNote = (
         values: createNoteValues,
         actions: FormikHelpers<createNoteValues>
     ) => {
-        console.log(values);
-        onSubmit(values)
-        actions.resetForm()
-        onClose()
+      createMutation.mutate(values)
+      actions.resetForm()
     };
 
     

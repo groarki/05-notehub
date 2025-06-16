@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { Note, createNoteValues } from "../types/note";
 
-interface fetchNotes {
+interface fetchNotesResponse {
     notes: Note[],
     totalPages: number,
 }
@@ -10,7 +10,7 @@ axios.defaults.baseURL = "https://notehub-public.goit.study/api"
 const token = import.meta.env.VITE_TOKEN
 
 export async function fetchNotes(searchText: string, page: number) {
-    const res = await axios.get<fetchNotes>("/notes", {
+    const res = await axios.get<fetchNotesResponse>("/notes", {
         headers: {
             Authorization: `Bearer ${token}`,
         },
@@ -23,8 +23,8 @@ export async function fetchNotes(searchText: string, page: number) {
     return res.data
 }
 
-export async function createNote(newTodo: createNoteValues) {
-    const res = await axios.post<Note>("/notes", newTodo, {
+export async function createNote(newNote: createNoteValues) {
+    const res = await axios.post<Note>("/notes", newNote, {
         headers: {
             Authorization: `Bearer ${token}`
         }

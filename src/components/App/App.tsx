@@ -1,7 +1,6 @@
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { createNote, deleteNote, fetchNotes } from "../../services/noteService"
+import { keepPreviousData, useQuery} from "@tanstack/react-query"
+import {fetchNotes } from "../../services/noteService"
 import NoteList from "../NoteList/NoteList"
-import type { createNoteValues } from "../../types/note"
 
 import css from "./App.module.css"
 import { useEffect, useState } from "react"
@@ -13,8 +12,6 @@ import Loader from "../Loader/Loader"
 
 
 function App() {
-  const queryClient = useQueryClient()
-
   const [currentPage, setCurrentPage] = useState(1)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -33,29 +30,6 @@ function App() {
     setCurrentPage(1);
   }, [debouncedQuery]);
 
-  const createMutation = useMutation({
-    mutationFn: createNote,
-    onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ["todos"]})
-    }
-  });
-
-  const handleCreateNote = (newTodo: createNoteValues) => {
-    createMutation.mutate(newTodo)
-  };
-  
-  const deleteMutation = useMutation({
-    mutationFn: deleteNote,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["todos"] })
-    }
-  });
-
-  const handleDeleteNote = (id: number) => {
-    deleteMutation.mutate(id)
-  };
-
-
   return (
     <div className={css.app}>
       <header className={css.toolbar}>
@@ -66,11 +40,10 @@ function App() {
         }
       </header>
       {isLoading && <Loader/>}
-      {data && <NoteList notes={data.notes} onDelete={handleDeleteNote}/>}
+      {data && <NoteList notes={data.notes}/>}
       {isModalOpen && (
         <NoteModal
           onClose={() => setIsModalOpen(false)}
-          onSubmitNote={handleCreateNote}
         />
       )}
     </div>
